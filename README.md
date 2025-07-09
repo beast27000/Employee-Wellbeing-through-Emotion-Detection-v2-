@@ -85,9 +85,7 @@ Employee-Wellbeing-Emotion-Detection/
 ├── test_model.py          # Testing script with GUI
 ├── Sever.py               # The Backend that contains the model logic and connection to the frontend 
 ├── database.py            # PostgreSQL schema
-├── api_server.py          # FastAPI server
 ├── README.md              # Project docs
-├── requirements.txt       # Dependencies
 └── .gitignore             # Excluded files
 ```
 
