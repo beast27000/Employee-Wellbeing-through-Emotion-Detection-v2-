@@ -79,11 +79,12 @@ Employee-Wellbeing-Emotion-Detection/
 │   ├── main.js           # JavaScript for frontend logic
 │   └── apexcharts.min.js # ApexCharts library
 ├── dashboard.html         # Public homepage (TailwindCSS + HTML)
+├── department_analysis.html # The Deparment wise analysis for Admin 
 ├── index.html             # Main application interface (SPA with TailwindCSS)
-├── train_models.py        # CUDA-accelerated training script
+├── arc.py                 # All 3 models architecture 
 ├── test_model.py          # Testing script with GUI
 ├── Sever.py               # The Backend that contains the model logic and connection to the frontend 
-├── database_setup.sql     # PostgreSQL schema
+├── database.py            # PostgreSQL schema
 ├── api_server.py          # FastAPI server
 ├── README.md              # Project docs
 ├── requirements.txt       # Dependencies
