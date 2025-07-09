@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellTrack - Emotion Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.53.0/dist/apexcharts.min.js"></script>
+    <script>
+        if (typeof ApexCharts === 'undefined') {
+            document.write('<script src="/static/apexcharts.min.js"><\/script>');
+        }
+    </script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .navbar { background: linear-gradient(90deg, #457B9D, #9D4EDD); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+        .nav-button {
+            background: #52B788;
+            border-radius: 20px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            background: #B7E4C7;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .card-hover { transition: transform 0.3s; }
+        .card-hover:hover { transform: translateY(-5px); }
+        .blog-content { max-width: 900px; margin: 0 auto; }
+        .sample-strip { display: flex; overflow-x: auto; gap: 1rem; padding: 1rem; }
+        .sample-card { 
+            flex: 0 0 auto; 
+            width: 150px; 
+            background: #ffffff; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            overflow: hidden;
+            text-align: center;
+        }
+        .sample-card img { 
+            width: 100%; 
+            height: 150px; 
+            object-fit: cover; 
+            border-radius: 12px 12px 0 0; 
+        }
+        .sample-card .label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #457B9D;
+            padding: 0.5rem;
+            background: #B7E4C7;
+        }
+        .section-title { color: #457B9D; }
+        .highlight-box { 
+            background: linear-gradient(135deg, #A8DADC, #CDB4DB); 
+            border-left: 4px solid #52B788; 
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            border-radius: 12px; 
+        }
+        .profile-img { 
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 4px solid #52B788; 
+            margin-bottom: 1.5rem; 
+        }
+    </style>
+</head>
+<body class="bg-[#f0f4f8] transition-colors duration-300">
+    <!-- Navigation Bar -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-white">WellTrack</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.location.href='/dashboard.html'" class="nav-button text-white font-medium">Home</button>
+                    <button onclick="showScreen('about')" class="nav-button text-white font-medium">About Us</button>
+                    <button onclick="showScreen('description')" class="nav-button text-white font-medium">Description</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20">
+        <!-- Login Screen -->
+        <div id="login-screen" class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md card-hover">
+                <h1 class="text-3xl font-bold mb-6 text-center text-[#457B9D]">WellTrack Login</h1>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Employee ID</label>
+                    <input id="employee-id" type="text" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                </div>
+                <div class="mb-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Department</label>
+                    <select id="department" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="IT">IT</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="All">All</option>
+                    </select>
+                </div>
+                <button onclick="handleLogin()" class="w-full nav-button bg-[#52B788] text-white">Login</button>
+                <button onclick="promptAdminLogin()" class="w-full mt-3 nav-button bg-[#9D4EDD] text-white">Admin Dashboard</button>
+                <button onclick="showScreen('feedback-login')" class="w-full mt-3 nav-button bg-[#CDB4DB] text-white">Feedback</button>
+            </div>
+        </div>
+
+        <!-- Model Selection Screen -->
+        <div id="selection-screen" class="hidden flex items-center justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md card-hover">
+                <h1 class="text-3xl font-bold mb-6 text-center text-[#457B9D]">Select Model</h1>
+                <div class="mb-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Model</label>
+                    <select id="model" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="enhanced_cnn">Enhanced CNN</option>
+                        <option value="resnet18">ResNet18</option>
+                        <option value="ensemble">Ensemble</option>
+                    </select>
+                </div>
+                <button onclick="handleProceed()" class="w-full nav-button bg-[#52B788] text-white">Proceed to Detection</button>
+                <button onclick="showScreen('login')" class="w-full mt-3 nav-button bg-[#9D4EDD] text-white">Back to Login</button>
+            </div>
+        </div>
+
+        <!-- Main Detection Screen -->
+        <div id="main-screen" class="hidden container mx-auto p-4">
+            <div class="flex justify-between items-center mb-6">
+                <div id="user-info" class="text-lg font-semibold text-[#457B9D]"></div>
+                <button onclick="showScreen('login')" class="nav-button bg-[#9D4EDD] text-white">Logout</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-xl card-hover">
+                    <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Video Feed</h2>
+                    <img id="video-feed" src="" alt="Video Feed" class="w-full h-auto hidden rounded-lg">
+                    <div id="camera-off" class="flex items-center justify-center h-96 bg-[#A8DADC] text-white rounded-lg">Camera Off</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-xl card-hover">
+                    <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Real-time Emotion Stats</h2>
+                    <div id="stats-chart" class="h-80"></div>
+                    <p id="status" class="mt-4 font-semibold text-[#457B9D]">Status: No emotion detected yet</p>
+                    <p id="session-time" class="text-gray-600">Session Time: 00:00:00</p>
+                </div>
+            </div>
+            <div class="mt-6 flex flex-wrap gap-4">
+                <button onclick="startCamera()" class="nav-button bg-[#52B788] text-white">Start Camera</button>
+                <button onclick="stopCamera()" class="nav-button bg-[#9D4EDD] text-white">Stop Camera</button>
+                <label class="nav-button bg-[#CDB4DB] text-white cursor-pointer">
+                    Upload Video
+                    <input id="video-upload" type="file" accept="video/*" onchange="uploadVideo(event)" class="hidden">
+                </label>
+                <button onclick="testSamples()" class="nav-button bg-[#52B788] text-white">Test Random Samples</button>
+            </div>
+            <div id="sample-strip" class="hidden mt-6 bg-white p-4 rounded-lg shadow-xl card-hover">
+                <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Tested Sample Images</h2>
+                <div id="sample-images" class="sample-strip"></div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Screen -->
+        <div id="admin-screen" class="hidden container mx-auto p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl card-hover">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-[#457B9D]">Admin Dashboard</h1>
+                    <button onclick="showScreen('login')" class="nav-button bg-[#9D4EDD] text-white">Back to Login</button>
+                </div>
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Department</label>
+                        <select id="admin-dept" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                            <option value="All">All</option>
+                            <option value="IT">IT</option>
+                            <option value="Accounting">Accounting</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Date Range</label>
+                        <select id="admin-date" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                            <option value="Last 7 Days">Last 7 Days</option>
+                            <option value="Last 30 Days">Last 30 Days</option>
+                            <option value="All Time">All Time</option>
+                        </select>
+                    </div>
+                    <button onclick="fetchAdminStats()" class="nav-button bg-[#52B788] text-white">Apply Filters</button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-[#A8DADC] p-6 rounded-lg">
+                        <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Emotion Distribution</h2>
+                        <div id="compliance-chart" class="h-80"></div>
+                    </div>
+                    <div class="bg-[#B7E4C7] p-6 rounded-lg">
+                        <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Department Activity</h2>
+                        <div id="acceptance-chart" class="h-80"></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Employee Details</h2>
+                    <p id="admin-loading" class="loading hidden">Loading...</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-[#CDB4DB]">
+                                    <th class="border p-3 text-left text-[#457B9D]">Employee ID</th>
+                                    <th class="border p-3 text-left text-[#457B9D]">Department</th>
+                                    <th class="border p-3 text-left text-[#457B9D]">Sessions</th>
+                                    <th class="border p-3 text-left text-[#457B9D]">Avg Duration (min)</th>
+                                    <th class="border p-3 text-left text-[#457B9D]">Dominant Emotion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Us Screen -->
+        <div id="about-screen" class="hidden container mx-auto p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl card-hover blog-content">
+                <h1 class="text-4xl font-bold mb-6 text-center section-title">About Me</h1>
+                <div class="text-center">
+                    <img id="profile-image" src="/static/vishvvesh_profile.jpg" alt="Vishvvesh Nagappan Profile" class="profile-img mx-auto">
+                </div>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">Who I Am</h2>
+                    <p class="text-gray-600 mb-4">
+                        Hi! I’m Vishvvesh Nagappan, a passionate Computer Science Engineering student at SRM University, specializing in Artificial Intelligence and Machine Learning. My enthusiasm for technology drives me to create impactful AI solutions, with expertise in machine learning, deep learning, full-stack development, and robotics.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        From developing smart prosthetic legs to building emotion detection systems like WellTrack, I’m dedicated to using technology to improve lives. My goal is to create innovative solutions that make a real difference.
+                    </p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">My Journey</h2>
+                    <p class="text-gray-600 mb-4">Over the past few years, I’ve:</p>
+                    <ul class="list-disc list-inside text-gray-600 mb-4">
+                        <li>Built end-to-end ML pipelines using PyCaret, TPOT, and Scikit-learn.</li>
+                        <li>Developed deep learning solutions with PyTorch, Keras, and OpenCV.</li>
+                        <li>Accelerated ML workflows on GPUs using NVIDIA CUDA, leveraging cuML, cuDF, and CuPy to optimize performance.</li>
+                        <li>Designed and deployed full-stack web applications with React.js, Node.js, and AWS.</li>
+                        <li>Created interactive dashboards with YData Profiling and visualization tools.</li>
+                        <li>Mastered Python, C++, C, Java, and JavaScript.</li>
+                    </ul>
+                    <p class="text-gray-600 mb-4">
+                        Through internships at CGI and Chipware Technologies, I’ve gained experience in MLOps, AutoML, and scalable software design. I’ve also taught robotics, Python, and AI to students, bringing tech education to underserved communities.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        Outside coding, I contribute to university fests like Aarush and am preparing to publish research on AI-driven lung cancer detection and AI in gaming.
+                    </p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">Current Focus</h2>
+                    <p class="text-gray-600 mb-4">
+                        I’m exploring GPU-accelerated data science with RAPIDS, using cuML, cuDF, and CuPy to enhance the speed and scalability of projects like WellTrack. My focus is on creating custom deep learning models for emotion detection, pushing the boundaries of AI in workplace wellness.
+                    </p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">Connect with Me</h2>
+                    <ul class="list-none text-gray-600 mb-4">
+                        <li class="mb-2"><strong>Email:</strong> <a href="mailto:vishvvesh@gmail.com" class="text-[#52B788] hover:underline">vishvvesh@gmail.com</a></li>
+                        <li class="mb-2"><strong>LinkedIn:</strong> <a href="https://linkedin.com/in/vishvvesh-nagappan-4b1760252" class="text-[#52B788] hover:underline" target="_blank">linkedin.com/in/vishvvesh-nagappan-4b1760252</a></li>
+                        <li><strong>GitHub:</strong> <a href="https://github.com/beast27000" class="text-[#52B788] hover:underline" target="_blank">github.com/beast27000</a></li>
+                    </ul>
+                </section>
+                <div class="text-center">
+                    <button onclick="window.location.href='/dashboard.html'" class="nav-button bg-[#52B788] text-white">Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description Screen -->
+        <div id="description-screen" class="hidden container mx-auto p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl card-hover blog-content">
+                <h1 class="text-4xl font-bold mb-6 text-center section-title">WellTrack: Transforming Workplace Wellness</h1>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">Why We Need WellTrack</h2>
+                    <p class="text-gray-600 mb-4">
+                        In today’s fast-paced work environment, employee mental health is critical to organizational success. Stress, burnout, and disengagement can silently erode productivity and morale. WellTrack addresses this by using AI to monitor employee emotions in real-time, providing employers with insights to foster a supportive workplace.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        Our mission is to enhance employee wellbeing, reduce turnover, and create a culture of empathy and positivity. WellTrack empowers organizations to prioritize mental health, ensuring every employee feels valued.
+                    </p>
+                    <div class="highlight-box">
+                        <p class="text-gray-700">
+                            <strong>Did You Know?</strong> Prioritizing employee wellbeing can increase productivity by up to 20% and reduce absenteeism significantly.
+                        </p>
+                    </div>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">What WellTrack Does</h2>
+                    <p class="text-gray-600 mb-4">
+                        WellTrack is an AI-powered platform that monitors employee emotions through live video feeds or uploaded videos. Using advanced deep learning models, it detects seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise, providing real-time insights into workforce wellbeing.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        Key features include:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 mb-4">
+                        <li>Real-time emotion detection with live video streaming.</li>
+                        <li>Admin dashboard with analytics on emotion distribution and department activity.</li>
+                        <li>Feedback system for employees to share their experiences anonymously.</li>
+                        <li>Support for video uploads and random sample testing for quality assurance.</li>
+                    </ul>
+                    <p class="text-gray-600 mb-4">
+                        WellTrack integrates seamlessly into workplace wellness programs, making it an essential tool for HR and management teams.
+                    </p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">How WellTrack Works</h2>
+                    <p class="text-gray-600 mb-4">
+                        WellTrack uses three custom deep learning models—CustomCNN, ResNet18, and an Ensemble model—trained on the FER dataset with 350,000 images. These models process video frames using OpenCV and PyTorch, detecting faces and classifying emotions in milliseconds.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        The web app, built with FastAPI and SocketIO, streams video and updates real-time charts using ApexCharts. CUDA acceleration ensures smooth performance, even with high-resolution streams. Data is stored in a PostgreSQL database for analysis.
+                    </p>
+                    <div class="highlight-box">
+                        <p class="text-gray-700">
+                            <strong>Real-Time Advantage:</strong> CUDA acceleration enables WellTrack to process video frames in milliseconds, ensuring instant emotion detection.
+                        </p>
+                    </div>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">The Technical Backbone</h2>
+                    <p class="text-gray-600 mb-4">
+                        WellTrack’s models were trained on an NVIDIA RTX 4060 with CUDA, using mixed precision training, label smoothing, and data augmentation to achieve high accuracy. The FER dataset’s diversity ensures robust performance in office settings.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        We’re continuously improving our models with more data and advanced techniques to enhance accuracy and adaptability.
+                    </p>
+                    <div class="highlight-box">
+                        <p class="text-gray-700">
+                            <strong>Tech Highlight:</strong> Training on CUDA reduced processing time by up to 50%, enabling efficient handling of 350,000 images.
+                        </p>
+                    </div>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 section-title">Our Vision</h2>
+                    <p class="text-gray-600 mb-4">
+                        WellTrack is more than an emotion detection tool—it’s a commitment to creating healthier workplaces. By leveraging AI, we aim to make mental health a priority, fostering environments where employees thrive.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        Join us in transforming workplace wellness with WellTrack.
+                    </p>
+                </section>
+                <div class="text-center">
+                    <button onclick="window.location.href='/dashboard.html'" class="nav-button bg-[#52B788] text-white">Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Login Screen -->
+        <div id="feedback-login-screen" class="hidden flex items-center justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md card-hover">
+                <h1 class="text-3xl font-bold mb-6 text-center text-[#457B9D]">Feedback Login</h1>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Employee ID (3 letters)</label>
+                    <input id="feedback-employee-id" type="text" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Department</label>
+                    <select id="feedback-department" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="IT">IT</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="All">All</option>
+                    </select>
+                </div>
+                <button onclick="handleFeedbackLogin()" class="w-full nav-button bg-[#52B788] text-white">Login as Employee</button>
+                <div class="mt-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Admin Password</label>
+                    <input id="feedback-admin-password" type="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                </div>
+                <button onclick="handleFeedbackAdminLogin()" class="w-full mt-3 nav-button bg-[#9D4EDD] text-white">Login as Admin</button>
+            </div>
+        </div>
+
+        <!-- Feedback Submission Screen -->
+        <div id="feedback-screen" class="hidden container mx-auto p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl card-hover">
+                <h1 class="text-3xl font-bold mb-6 text-center text-[#457B9D]">Feedback Form</h1>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">1. How comfortable are you with emotion monitoring?</label>
+                    <select id="question-1" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="1">Very Uncomfortable</option>
+                        <option value="2">Uncomfortable</option>
+                        <option value="3">Neutral</option>
+                        <option value="4">Comfortable</option>
+                        <option value="5">Very Comfortable</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">2. Does WellTrack help you feel supported at work?</label>
+                    <select id="question-2" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="1">Not at All</option>
+                        <option value="2">Slightly</option>
+                        <option value="3">Moderately</option>
+                        <option value="4">Quite a Bit</option>
+                        <option value="5">Very Much</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">3. How often do you feel your emotions are accurately detected?</label>
+                    <select id="question-3" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="1">Never</option>
+                        <option value="2">Rarely</option>
+                        <option value="3">Sometimes</option>
+                        <option value="4">Often</option>
+                        <option value="5">Always</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">4. Do you feel comfortable sharing feedback anonymously?</label>
+                    <select id="question-4" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="1">Not at All</option>
+                        <option value="2">Slightly</option>
+                        <option value="3">Moderately</option>
+                        <option value="4">Quite a Bit</option>
+                        <option value="5">Very Much</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">5. How likely are you to recommend WellTrack?</label>
+                    <select id="question-5" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="1">Not Likely</option>
+                        <option value="2">Slightly Likely</option>
+                        <option value="3">Moderately Likely</option>
+                        <option value="4">Very Likely</option>
+                        <option value="5">Extremely Likely</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Additional Feedback</label>
+                    <textarea id="text-feedback" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]" rows="4"></textarea>
+                </div>
+                <button onclick="submitFeedback()" class="w-full nav-button bg-[#52B788] text-white">Submit Feedback</button>
+                <button onclick="window.location.href='/dashboard.html'" class="w-full mt-3 nav-button bg-[#9D4EDD] text-white">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Admin Feedback Screen -->
+        <div id="admin-feedback-screen" class="hidden container mx-auto p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl card-hover">
+                <h1 class="text-3xl font-bold mb-6 text-center text-[#457B9D]">Admin Feedback Review</h1>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Employee ID (3 letters)</label>
+                    <input id="admin-feedback-employee-id" type="text" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                </div>
+                <button onclick="fetchAdminFeedback()" class="w-full nav-button bg-[#52B788] text-white">Fetch Feedback</button>
+                <div id="feedback-results" class="mt-6"></div>
+                <button onclick="showScreen('login')" class="w-full mt-3 nav-button bg-[#9D4EDD] text-white">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

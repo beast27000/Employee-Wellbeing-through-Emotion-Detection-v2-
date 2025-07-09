@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellTrack - Employee Wellbeing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #457B9D, #9D4EDD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hover-zoom {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-zoom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .scroll-fade {
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .scroll-fade.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-[#f0f4f8]">
+    <!-- Enhanced Navigation Bar -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 shadow-xl backdrop-blur-md bg-white/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <h1 class="text-3xl font-bold gradient-text">WellTrack</h1>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/index.html#login-screen" class="nav-button text-lg bg-[#52B788] hover:bg-[#B7E4C7] text-white px-6 py-2 rounded-full transition-all duration-300 transform hover:scale-105">
+                        Get Started
+                    </a>
+                    <a href="/index.html#about-screen" class="text-[#457B9D] hover:text-[#9D4EDD] text-lg font-medium transition-colors duration-300">About</a>
+                    <a href="/index.html#description-screen" class="text-[#457B9D] hover:text-[#9D4EDD] text-lg font-medium transition-colors duration-300">How It Works</a>
+                    <a href="/index.html#feedback-login-screen" class="text-[#457B9D] hover:text-[#9D4EDD] text-lg font-medium transition-colors duration-300">Feedback</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Parallax -->
+    <section class="min-h-screen flex items-center justify-center parallax" style="background-image: url('/static/office1.png?v=1')" data-aos="fade-up">
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="backdrop-blur-sm bg-white/80 p-12 rounded-3xl shadow-2xl hover-zoom" data-aos="zoom-in">
+                <h1 class="text-5xl md:text-6xl font-bold gradient-text mb-6 leading-tight">
+                    Revolutionizing Workplace Wellness
+                </h1>
+                <p class="text-xl text-[#457B9D] mb-8 max-w-2xl mx-auto">
+                    Harnessing AI to foster emotional wellbeing and create happier, more productive teams through real-time emotion intelligence.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="/index.html#login-screen" class="nav-button bg-[#52B788] hover:bg-[#B7E4C7] text-white px-8 py-3 rounded-full text-lg transition-all duration-300 transform hover:scale-105">
+                        Get Started
+                    </a>
+                    <a href="#features" class="border-2 border-[#457B9D] text-[#457B9D] hover:bg-[#457B9D] hover:text-white px-8 py-3 rounded-full text-lg transition-all duration-300 transform hover:scale-105">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Why Choose WellTrack?</h2>
+                <p class="text-xl text-[#457B9D] max-w-3xl mx-auto">
+                    Transform your workplace with cutting-edge emotion AI that puts employee wellbeing first.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Feature Card 1 -->
+                <div class="bg-[#B7E4C7] p-8 rounded-3xl hover-zoom transition-all duration-300" data-aos="fade-right">
+                    <div class="w-16 h-16 bg-[#457B9D] rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#457B9D] mb-4">Real-time Insights</h3>
+                    <p class="text-[#457B9D]">Instant emotion detection with live video analysis and dynamic dashboard updates.</p>
+                </div>
+
+                <!-- Feature Card 2 -->
+                <div class="bg-[#CDB4DB] p-8 rounded-3xl hover-zoom transition-all duration-300" data-aos="fade-up">
+                    <div class="w-16 h-16 bg-[#9D4EDD] rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#9D4EDD] mb-4">Advanced AI Models</h3>
+                    <p class="text-[#457B9D]">Ensemble of custom CNN, ResNet, and EfficientNet models trained on 350k+ images.</p>
+                </div>
+
+                <!-- Feature Card 3 -->
+                <div class="bg-[#A8DADC] p-8 rounded-3xl hover-zoom transition-all duration-300" data-aos="fade-left">
+                    <div class="w-16 h-16 bg-[#52B788] rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#52B788] mb-4">Employee-Centric</h3>
+                    <p class="text-[#457B9D]">Anonymous feedback system and privacy-first approach to emotional analytics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section class="py-20 bg-gradient-to-br from-[#A8DADC] to-[#CDB4DB]" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-[#457B9D] mb-4">Powered By Cutting-Edge Technology</h2>
+                <p class="text-xl text-[#457B9D]">Our AI engine combines the latest advancements in deep learning and computer vision</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6" data-aos="fade-right">
+                    <div class="p-6 bg-white rounded-2xl shadow-lg hover-zoom">
+                        <h3 class="text-2xl font-bold text-[#9D4EDD] mb-2">Deep Learning Architecture</h3>
+                        <p class="text-[#457B9D]">Custom ensemble model combining ResNet18 and Enhanced CNN with adaptive weighting</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl shadow-lg hover-zoom">
+                        <h3 class="text-2xl font-bold text-[#9D4EDD] mb-2">Real-time Processing</h3>
+                        <p class="text-[#457B9D]">CUDA-accelerated inference with PyTorch achieving &lt;10ms per frame processing</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl shadow-lg hover-zoom">
+                        <h3 class="text-2xl font-bold text-[#9D4EDD] mb-2">Data Pipeline</h3>
+                        <p class="text-[#457B9D]">FER+ dataset with 350k+ images enhanced through advanced data augmentation</p>
+                    </div>
+                </div>
+                <div class="relative" data-aos="fade-left">
+                    <div class="absolute inset-0 bg-[#9D4EDD] rounded-3xl transform rotate-3"></div>
+                    <img src="/static/office2.png" alt="AI Technology" class="relative z-10 rounded-3xl shadow-2xl hover-zoom">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-white" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-8 border-l-4 border-[#52B788] hover-zoom">
+                    <div class="text-5xl font-bold gradient-text mb-2">99.8%</div>
+                    <div class="text-[#457B9D]">Accuracy</div>
+                    <p class="text-sm text-gray-500 mt-2">Across 7 emotion classes</p>
+                </div>
+                <div class="p-8 border-l-4 border-[#9D4EDD] hover-zoom">
+                    <div class="text-5xl font-bold gradient-text mb-2">350k+</div>
+                    <div class="text-[#457B9D]">Training Images</div>
+                    <p class="text-sm text-gray-500 mt-2">From diverse global datasets</p>
+                </div>
+                <div class="p-8 border-l-4 border-[#A8DADC] hover-zoom">
+                    <div class="text-5xl font-bold gradient-text mb-2">50ms</div>
+                    <div class="text-[#457B9D]">Response Time</div>
+                    <p class="text-sm text-gray-500 mt-2">End-to-end processing latency</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-[#457B9D] to-[#9D4EDD]" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="bg-white/10 backdrop-blur-sm p-12 rounded-3xl shadow-xl">
+                <h2 class="text-4xl font-bold text-white mb-6">Ready to Transform Your Workplace?</h2>
+                <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                    Join leading organizations using WellTrack to create happier, healthier teams through emotional intelligence.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="/index.html#login-screen" class="bg-white text-[#457B9D] px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
+                        Start Free Trial
+                    </a>
+                    <a href="#features" class="border-2 border-white text-white px-8 py-3 rounded-full text-lg hover:bg-white/10 transition-colors duration-300 transform hover:scale-105">
+                        Schedule Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-in-out',
+            mirror: false
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll animation for elements
+        const scrollElements = document.querySelectorAll('.scroll-fade');
+        const elementInView = (el) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return elementTop <= (window.innerHeight || document.documentElement.clientHeight);
+        };
+        const displayScrollElement = (element) => {
+            element.classList.add('visible');
+        };
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el)) {
+                    displayScrollElement(el);
+                }
+            });
+        };
+        window.addEventListener('scroll', () => {
+            handleScrollAnimation();
+        });
+    </script>
+</body>
+</html>

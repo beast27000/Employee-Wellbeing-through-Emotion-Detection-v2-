@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellTrack - Department Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.53.0/dist/apexcharts.min.js"></script>
+    <script>
+        if (typeof ApexCharts === 'undefined') {
+            document.write('<script src="/static/apexcharts.min.js"><\/script>');
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .navbar {
+            background: linear-gradient(90deg, #457B9D, #9D4EDD);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .nav-button {
+            background: #52B788;
+            border-radius: 20px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            background: #B7E4C7;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .card-hover { transition: transform 0.3s; }
+        .card-hover:hover { transform: translateY(-5px); }
+        .section-title { color: #457B9D; }
+        .highlight-box {
+            background: linear-gradient(135deg, #A8DADC, #CDB4DB);
+            border-left: 4px solid #52B788;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="bg-[#f0f4f8]">
+    <!-- Navigation Bar -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-white">WellTrack</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/index.html#admin-screen" class="nav-button text-white font-medium">Admin Dashboard</a>
+                    <a href="/dashboard.html" class="nav-button text-white font-medium">Home</a>
+                    <a href="/index.html#about-screen" class="nav-button text-white font-medium">About Us</a>
+                    <a href="/index.html#description-screen" class="nav-button text-white font-medium">Description</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 container mx-auto p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl card-hover">
+            <h1 class="text-3xl font-bold mb-6 text-center section-title">Department Analysis (Last 4 Days)</h1>
+            <div class="highlight-box mb-6">
+                <p class="text-gray-700">
+                    <strong>Insight:</strong> This page shows emotion trends across departments over the last 4 days, helping admins identify patterns and prioritize wellness initiatives.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-4 mb-6">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Department</label>
+                    <select id="dept-filter" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#52B788]">
+                        <option value="All">All</option>
+                        <option value="IT">IT</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="Marketing">Marketing</option>
+                    </select>
+                </div>
+                <button onclick="fetchDepartmentAnalysis()" class="nav-button bg-[#52B788] text-white">Apply Filter</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
+                <div class="bg-[#A8DADC] p-6 rounded-lg">
+                    <h2 class="text-xl font-bold mb-4 text-[#457B9D]">Emotion Distribution by Department</h2>
+                    <div id="dept-emotion-chart" class="h-96"></div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <button onclick="window.location.href='/index.html#admin-screen'" class="nav-button bg-[#9D4EDD] text-white">Back to Admin Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deptEmotionChart = null;
+
+        async function fetchDepartmentAnalysis() {
+            try {
+                const department = document.getElementById('dept-filter').value;
+                const response = await axios.get('/admin_stats', {
+                    params: { department, date_range: 'Last 4 Days' }
+                });
+                const data = response.data.dept_analysis;
+                renderDeptEmotionChart(data);
+            } catch (error) {
+                console.error('Error fetching department analysis:', error);
+                alert('Failed to load department analysis data. Please try again.');
+            }
+        }
+
+        function renderDeptEmotionChart(data) {
+            const departments = ['IT', 'Accounting', 'Marketing'];
+            const emotions = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'];
+            const dates = [...new Set(data.map(item => item.date))].sort();
+
+            const series = emotions.map(emotion => ({
+                name: emotion.charAt(0).toUpperCase() + emotion.slice(1),
+                data: dates.map(date => {
+                    let total = 0;
+                    departments.forEach(dept => {
+                        const record = data.find(
+                            d => d.date === date && d.department === dept && d.dominant_emotion === emotion
+                        );
+                        total += record ? record.session_count : 0;
+                    });
+                    return total;
+                })
+            }));
+
+            const options = {
+                chart: {
+                    type: 'bar',
+                    height: 400,
+                    stacked: true,
+                    toolbar: { show: true }
+                },
+                plotOptions: {
+                    bar: { horizontal: false, columnWidth: '55%' }
+                },
+                dataLabels: { enabled: false },
+                series,
+                xaxis: {
+                    categories: dates,
+                    title: { text: 'Date' }
+                },
+                yaxis: {
+                    title: { text: 'Session Count' }
+                },
+                colors: ['#FF4560', '#FFA07A', '#FFD700', '#00E396', '#008FFB', '#FF6347', '#C71585'],
+                legend: { position: 'top' },
+                fill: { opacity: 1 }
+            };
+
+            if (deptEmotionChart) {
+                deptEmotionChart.destroy();
+            }
+            deptEmotionChart = new ApexCharts(document.querySelector('#dept-emotion-chart'), options);
+            deptEmotionChart.render();
+        }
+
+        // Fetch data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDepartmentAnalysis();
+        });
+    </script>
+</body>
+</html>
