@@ -82,7 +82,7 @@ Employee-Wellbeing-Emotion-Detection/
 ├── index.html             # Main application interface (SPA with TailwindCSS)
 ├── train_models.py        # CUDA-accelerated training script
 ├── test_model.py          # Testing script with GUI
-├── real_time_detection.py # Real-time detection with database storage
+├── Sever.py               # The Backend that contains the model logic and connection to the frontend 
 ├── database_setup.sql     # PostgreSQL schema
 ├── api_server.py          # FastAPI server
 ├── README.md              # Project docs
